@@ -3,10 +3,15 @@
 ![n8n](https://img.shields.io/badge/n8n-Automation-red)
 ![OpenAI](https://img.shields.io/badge/OpenAI-AI%20Agents-green)
 ![JSON](https://img.shields.io/badge/Templates-JSON-blue)
-![GitHub stars](https://img.shields.io/github/stars/fannyrodriguez/fanny-n8n-templates?style=social)
+![GitHub stars](https://img.shields.io/github/stars/Fgrodriguezs/Fanny-n8n-templates?style=social)
 
 > Production-ready AI automation templates built with n8n, OpenAI, Airtable, Google APIs, and CRMs.  
 > Plantillas de automatización listas para producción con n8n, OpenAI, Airtable, Google APIs y CRMs.
+
+## 🔥 Real Impact (From CV)
+**Datapath AI (2024-)**: AI Automation Lead - Production pipelines  
+**PraxIA Solutions (2025)**: PyME automation - 70% lead response boost  
+**5+ enterprise workflows** con **n8n + CRM + OpenAI + Airtable + Supabase**
 
 ---
 
