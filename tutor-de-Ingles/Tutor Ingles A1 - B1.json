@@ -1,0 +1,1307 @@
+{
+  "name": "Tutor Ingles A1 - B1",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Recibe Mensaje de Telegram",
+        "height": 280,
+        "width": 340,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        320,
+        496
+      ],
+      "typeVersion": 1,
+      "id": "9ccbcb45-98f1-4582-af0a-2b6efaa347b4",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Texto"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b21a4b20-0d53-4500-95c4-ebb29aa7823f",
+                    "leftValue": "={{ $json.message.voice.file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Áudio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f01b0c53-0531-4f8a-9ae5-629969593dc3",
+                    "leftValue": "={{ $json.message.photo[0].file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Imagen"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        848,
+        576
+      ],
+      "id": "72377f12-18bd-474c-83b3-e7058afbb1c2",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        592
+      ],
+      "id": "c2371141-6005-4dca-bec4-a2b4098fbb2a",
+      "name": "Telegram Trigger",
+      "webhookId": "ID-WEBHOOK-OCULTO",
+      "credentials": {
+        "telegramApi": {
+          "id": "ID-CREDENCIAL-ANONIMA",
+          "name": "Tutor Ingles"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json[\"message\"][\"voice\"][\"file_id\"] }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1472,
+        432
+      ],
+      "id": "9e99899c-5df7-433f-b9b4-aaab19479ddb",
+      "name": "Telegram (Get file)1",
+      "webhookId": "ID-WEBHOOK-OCULTO",
+      "credentials": {
+        "telegramApi": {
+          "id": "ID-CREDENCIAL-ANONIMA",
+          "name": "Tutor Ingles"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.image_file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1728,
+        752
+      ],
+      "id": "624af0c6-a964-4bd4-a5ea-6bd8b9025096",
+      "name": "Telegram (Get file)",
+      "webhookId": "ID-WEBHOOK-OCULTO",
+      "credentials": {
+        "telegramApi": {
+          "id": "ID-CREDENCIAL-ANONIMA",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1728,
+        432
+      ],
+      "id": "bb045ab3-a680-4ae3-ae5a-4354163b432a",
+      "name": "OpenAI - Audio",
+      "credentials": {
+        "openAiApi": {
+          "id": "ID-OPENAI-ANONIMO",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "text": "Analiza esa imagen para mi",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        2480,
+        752
+      ],
+      "id": "842ec04f-09bd-479b-841b-9158892d657a",
+      "name": "OpenAI - Image",
+      "credentials": {
+        "openAiApi": {
+          "id": "ID-OPENAI-ANONIMO",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        3296,
+        736
+      ],
+      "id": "d9fe991c-b58a-4e6d-b43c-e2ce42dd706a",
+      "name": "Window Buffer Memory"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        3152,
+        752
+      ],
+      "id": "87728a6c-8512-4337-bcb8-4c61e4c1d970",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "ID-OPENAI-ANONIMO",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Flujo de Fallback",
+        "height": 260,
+        "width": 380,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1152,
+        1040
+      ],
+      "typeVersion": 1,
+      "id": "eed334f0-53b4-407d-8fc0-9bf00141af14",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "content": "## Flujo de Imagen",
+        "height": 280,
+        "width": 1600,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1152,
+        672
+      ],
+      "typeVersion": 1,
+      "id": "7be36ed1-5794-4159-a79d-956b9df27541",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "## Flujo de Audio",
+        "height": 260,
+        "width": 600,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1152,
+        352
+      ],
+      "typeVersion": 1,
+      "id": "7a0c34ee-6c26-47c6-9b48-1dc2af4696fe",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "## Flujo de Texto",
+        "height": 260,
+        "width": 340,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1152,
+        32
+      ],
+      "typeVersion": 1,
+      "id": "30c0ee4f-c0e1-4723-9ce3-247e21acfc8a",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $item(\"0\").$node[\"Telegram Trigger\"].json[\"message\"][\"chat\"][\"id\"] }}",
+        "text": "No fue posible entender el mensaje",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1488,
+        1120
+      ],
+      "id": "a2b11e83-3bae-46de-ac97-d664c81338a5",
+      "name": "Telegram2",
+      "webhookId": "ID-WEBHOOK-OCULTO",
+      "credentials": {
+        "telegramApi": {
+          "id": "ID-CREDENCIAL-ANONIMA",
+          "name": "Tutor Ingles"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ada205d8-55d5-40a4-8d1c-3225ee8be0cf",
+              "name": "text",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2752,
+        752
+      ],
+      "id": "79c2e785-d509-44a1-815b-a565c61f12ad",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data",
+        "options": {
+          "fileName": "={{ $('Telegram (Get file)').item.json.result.file_path }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        2240,
+        752
+      ],
+      "id": "902f4fb9-51ee-410a-8db5-b797104c2217",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        1968,
+        752
+      ],
+      "id": "6604b190-7102-4076-804a-909abd3f65d1",
+      "name": "Extract from File1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a6372787-ec9c-41f1-9e15-0f0b9ce951fa",
+              "name": "image_file_id",
+              "value": "={{ $json.message.photo[0].file_id }}",
+              "type": "string"
+            },
+            {
+              "id": "f854e868-a85d-419a-b33c-116a73e6ebef",
+              "name": "caption",
+              "value": "={{ $json.message.caption }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1472,
+        752
+      ],
+      "id": "325d0ca8-a27e-4627-8b6b-52eb87c6fe9c",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cacf4857-27e1-453d-aa1f-5fee889bc07c",
+              "name": "text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1472,
+        112
+      ],
+      "id": "4da87577-ce97-4e39-b0be-673c2109c07c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output.reply_text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        5264,
+        448
+      ],
+      "id": "39660057-a7c2-457e-ba19-a11a57d0ce19",
+      "name": "Send a text message",
+      "webhookId": "ID-WEBHOOK-OCULTO",
+      "credentials": {
+        "telegramApi": {
+          "id": "ID-CREDENCIAL-ANONIMA",
+          "name": "Tutor Ingles"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        4992,
+        480
+      ],
+      "id": "dbe6630e-4337-4264-8b66-1c15215899e8",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        5456,
+        448
+      ],
+      "id": "a4bb543b-9f21-493c-9b69-0c4f669c7204",
+      "name": "Wait",
+      "webhookId": "ID-WEBHOOK-OCULTO"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "=You are an English tutor for Telegram. Always respond in English, at A2–B1 level, with short, conversational turns.\nAllowed topics are strictly this whitelist: {{ $json.topics_whitelist.join(\", \") }}. Do not introduce content outside this list.\nWorkflow rules:\n\n1. If the student has not selected an activity, ask: “What do you want to practice — listening, grammar, or speaking?” and stop.\n2. Once an activity is chosen, stick to that single activity until the student asks to switch.\n3. Listening: provide ≤120-word scripts on an allowed topic, then ask 2–3 comprehension questions; accept answers and give brief corrective feedback; proceed step by step.\n4. Grammar: give 3–5 short exercises (fill-in, transform, error correction) on one allowed topic; after each answer, give quick feedback and a tiny rule + one example; increase difficulty gradually within A2–B1.\n5. Speaking: run a natural dialogue, one question at a time; correct gently with a brief recast + 1 example; continue with follow-ups on the same topic.\n6. Keep replies concise; never use Markdown or links; ensure at most two Telegram messages by length.\n7. If the student writes in Spanish, acknowledge briefly but continue in English.\n8. When the student shows strong command (consistent correct answers and fluent responses), you may slightly raise complexity but remain within A2–B1 unless they ask to level up.\n9. Always output JSON for the downstream parser with exactly these fields:\n{\n\"mode\": \"unknown | listening | grammar | speaking\",\n\"topic\": \"one of the whitelist or null\",\n\"reply_text\": \"the message to send as plain text (no Markdown)\",\n\"reply_tts\": \"short version for audio; if not needed, repeat reply_text\"\n}\nIMPORTANT: You must always output valid JSON with keys \"mode\", \"topic\", \"reply_text\", and \"reply_tts\". \nNever omit \"mode\" and \"topic\". If the student has already written or implied an activity and topic (e.g. \"listening at a restaurant\"), you MUST set mode=\"listening\" and topic=\"restaurant\". \n\nDo not add any other keys.\n\nIf no activity is selected, set mode=\"unknown\", topic=null and use:\nreply_text = \"What do you want to practice — listening, grammar, or speaking? Choose one topic too.\"\nreply_tts = reply_text"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        3184,
+        496
+      ],
+      "id": "fdf3847e-e154-47cd-9987-ae016016433d",
+      "name": "Agente English"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        4096,
+        720
+      ],
+      "id": "64a55527-9ad3-485b-974a-b7732e61fb70",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "ID-OPENAI-ANONIMO",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"reply_text\": \"string\",\n  \"reply_tts\": \"string\"\n}\n\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        4256,
+        704
+      ],
+      "id": "ca1346e8-fda1-42c5-8c72-fa0c72f2f95f",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an A2–B1 English tutor “humanizer”. Input is a draft reply for the student.\nGoals:\n- Rewrite in natural, friendly, conversational English (A2–B1).\n- Be concise (≤400 characters). No Markdown, no emojis, no links.\n- Preserve the intent and topic. Fix small grammar/wording issues.\n- Produce a short TTS version (≤200 characters) that sounds good when spoken.\n\nOUTPUT: You MUST call the provided output-formatting tool and return JSON with EXACTLY:\n{\n  \"reply_text\": \"<final student-facing text, plain text>\",\n  \"reply_tts\": \"<short TTS version; if unsure, reuse reply_text>\"\n}\nDo not include any extra keys or wrappers. Always use the tool.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        4128,
+        512
+      ],
+      "id": "d093f72f-edb6-4c4a-8a7e-cfc78773ad05",
+      "name": "AI Agent - Humanizador"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.route }}",
+                    "rightValue": "needs_selection",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "ea4fc7c9-104e-4159-aa58-31b3e86cb44f"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "needs_selection"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "28a79e9e-16df-43f5-b2d6-227c0b16327f",
+                    "leftValue": "={{ $json.route }}",
+                    "rightValue": "needs_topic",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "needs_topic"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c126a6cc-b867-47f4-9790-4b8b555d40fc",
+                    "leftValue": "={{ $json.route }}",
+                    "rightValue": "ok_practice",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ok_practice"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        3792,
+        480
+      ],
+      "id": "925e9123-3365-4f06-9edd-d79e1f0ac80b",
+      "name": "Gate – Mode & Topic"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "954365dc-b97d-4d47-9210-bb965f3424e0",
+              "name": "text",
+              "value": "=What do you want to practice — listening, grammar, or speaking? Choose ONE topic too (e.g., restaurant, travel, daily routine).\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4192,
+        352
+      ],
+      "id": "f772d9c9-1a2d-4179-86cc-7e35dc4a5c8e",
+      "name": "Ask Mode/Topic"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "954365dc-b97d-4d47-9210-bb965f3424e0",
+              "name": "text",
+              "value": "=What do you want to practice — listening, grammar, or speaking? Choose ONE topic too (e.g., restaurant, travel, daily routine).\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4192,
+        192
+      ],
+      "id": "fc994917-8108-462e-923f-a6bc7d32efb6",
+      "name": "Ask Type/practice"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        4448,
+        288
+      ],
+      "id": "07d1cadc-1d46-4eeb-ad11-bb4a3c9ace24",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Topics whitelist en inglés (A2–B1) + ambientes\nconst topics = [\n  \"present simple\",\"days of the week\",\"months of the year\",\"integers (numbers)\",\"dates\",\n  \"past simple\",\"present continuous\",\"present perfect\",\"past participle\",\"future simple\",\n  \"wh- questions\",\"prepositions of place\",\"verb be\",\"can\",\"have\",\"may\",\"might\",\"need\",\n  \"go\",\"do\",\"like\",\"would\",\"get\",\"shall\",\n  \"countable and uncountable nouns\",\"there is/there are\",\"to (preposition/infinitive)\",\n  \"for (preposition)\",\"it (pronoun)\",\"only\",\"just\",\"alone\",\"be able to\",\"used to\",\n  \"get used to\",\"should\",\n  \"restaurant\",\"classroom\",\"travel\",\"friends and neighbors\",\"daily routine\",\"hobbies\"\n];\n\nconst items = $input.all();\nfor (const item of items) {\n  item.json.topics_whitelist = topics;           // Array real\n  item.json.topics_list = topics.join(\", \");     // Texto para mostrar\n  item.json.level_target = \"A2-B1\";              // Nivel objetivo\n  item.json.lang_target = \"en\";                  // Forzar respuestas en inglés (si lo usas)\n}\nreturn items;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2944,
+        496
+      ],
+      "id": "ddbc7271-31c2-48b5-bc53-975a02e04278",
+      "name": "code"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nfunction normalize(item) {\n  const j = item.json;\n\n  let payload = j.output;\n  if (typeof payload === 'string') {\n    try { payload = JSON.parse(payload); } catch (e) { payload = { reply_text: payload }; }\n  }\n\n  const reply_text = payload?.reply_text ?? j.reply_text ?? null;\n  const reply_tts  = payload?.reply_tts  ?? j.reply_tts ?? reply_text;\n\n  let mode  = payload?.mode  ?? j.mode  ?? null;\n  let topic = payload?.topic ?? j.topic ?? null;\n\n  // 🔧 heurísticas de fallback si están vacíos\n  if ((!mode || mode === 'unknown') && reply_text) {\n    if (/script/i.test(reply_text) && /question/i.test(reply_text)) {\n      mode = 'listening';\n    }\n  }\n  if (!topic && reply_text) {\n    if (/restaurant/i.test(reply_text)) topic = 'restaurant';\n    if (/travel/i.test(reply_text)) topic = 'travel';\n    if (/daily routine/i.test(reply_text)) topic = 'daily routine';\n    // añade más si quieres\n  }\n\n  // Decide la ruta\n  let route;\n  if (!mode || mode === 'unknown') route = 'needs_selection';\n  else if (!topic)                 route = 'needs_topic';\n  else if (['listening','grammar','speaking'].includes(mode)) route = 'ok_practice';\n  else route = 'needs_selection';\n\n  return {\n    json: {\n      ...j,\n      mode,\n      topic,\n      reply_text,\n      reply_tts,\n      route,\n    }\n  };\n}\n\nreturn items.map(normalize);\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3536,
+        496
+      ],
+      "id": "71e49041-f259-4126-8b39-2f4879848036",
+      "name": "Normalizador"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.delivery || ($json.mode === 'listening' ? 'voice' : 'text') }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "7bd50be1-9679-4c8f-81cf-ca72dab58c1c"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b0bc9031-6f4a-45fa-bddb-22dcc7612794",
+                    "leftValue": "={{ $json.delivery || ($json.mode === 'listening' ? 'voice' : 'text') }}",
+                    "rightValue": "voice",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "voice"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        4544,
+        512
+      ],
+      "id": "ff0fe540-70bb-483e-9fb0-a75e04e4971d",
+      "name": "Delivery – Text/Voice"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "input": "={{ $json.output.reply_tts }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        4752,
+        608
+      ],
+      "id": "21b2ba85-5ca7-46b8-80bd-24f0d6e36bee",
+      "name": "Generate audio",
+      "credentials": {
+        "openAiApi": {
+          "id": "ID-OPENAI-ANONIMO",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        4704,
+        272
+      ],
+      "id": "fff6de6d-9d3c-43c8-87c5-8a2573514667",
+      "name": "Send a text message1",
+      "webhookId": "ID-WEBHOOK-OCULTO",
+      "credentials": {
+        "telegramApi": {
+          "id": "ID-CREDENCIAL-ANONIMA",
+          "name": "Tutor Ingles"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        5008,
+        672
+      ],
+      "id": "eb192e82-4170-4f83-9cd9-55b3c7c5190d",
+      "name": "Send a text message2",
+      "webhookId": "ID-WEBHOOK-OCULTO",
+      "credentials": {
+        "telegramApi": {
+          "id": "ID-CREDENCIAL-ANONIMA",
+          "name": "Tutor Ingles"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Telegram Trigger": [
+      {
+        "json": {
+          "update_id": 182686769,
+          "message": {
+            "message_id": 19,
+            "from": {
+              "id": 200000000,
+              "is_bot": false,
+              "first_name": "USUARIO_ANONIMO",
+              "username": "USER_ANON",
+              "language_code": "es"
+            },
+            "chat": {
+              "id": 200000000,
+              "first_name": "USUARIO_ANONIMO",
+              "username": "USER_ANON",
+              "type": "private"
+            },
+            "date": 1759096763,
+            "text": "Practicar listening como si estuviera en un restaurante restaurant"
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram (Get file)1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram (Get file)1": {
+      "main": [
+        [
+          {
+            "node": "OpenAI - Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram (Get file)": {
+      "main": [
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI - Audio": {
+      "main": [
+        [
+          {
+            "node": "code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI - Image": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agente English",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente English",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "OpenAI - Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Telegram (Get file)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente English": {
+      "main": [
+        [
+          {
+            "node": "Normalizador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent - Humanizador",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent - Humanizador",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent - Humanizador": {
+      "main": [
+        [
+          {
+            "node": "Delivery – Text/Voice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gate – Mode & Topic": {
+      "main": [
+        [
+          {
+            "node": "Ask Type/practice",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ask Mode/Topic",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent - Humanizador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ask Mode/Topic": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Ask Type/practice": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "code": {
+      "main": [
+        [
+          {
+            "node": "Agente English",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizador": {
+      "main": [
+        [
+          {
+            "node": "Gate – Mode & Topic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delivery – Text/Voice": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate audio": {
+      "main": [
+        [
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Bogota",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "c18aab6d-95cc-46dd-beed-570724df9e4c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ID-INSTANCIA-N8N-REEMPLAZADA"
+  },
+  "id": "Ab68g3Ru5lRpwsfv",
+  "tags": [
+    {
+      "createdAt": "2025-07-26T16:40:03.320Z",
+      "updatedAt": "2025-07-26T16:40:03.320Z",
+      "id": "KsoZnSVzxx1yf48U",
+      "name": "Telegram"
+    },
+    {
+      "createdAt": "2025-09-28T03:56:00.726Z",
+      "updatedAt": "2025-09-28T03:56:00.726Z",
+      "id": "UXgF4GsDRaelFqYP",
+      "name": "Tutor"
+    }
+  ]
+}

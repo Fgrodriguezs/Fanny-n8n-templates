@@ -1,0 +1,911 @@
+{
+  "name": "Onboarding Académico",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "get",
+        "subscriberId": "={{ $('Webhook').item.json.body.correo }}"
+      },
+      "type": "n8n-nodes-base.mailerLite",
+      "typeVersion": 2,
+      "position": [
+        208,
+        160
+      ],
+      "id": "c929392d-1ca5-4825-b6bb-b4020d54b5c2",
+      "name": "Verificación de Suscriptores",
+      "retryOnFail": true,
+      "credentials": {
+        "mailerLiteApi": {
+          "id": "ID_CREDENCIAL_MAILERLITE",
+          "name": "Mailer Lite account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "email": "={{ $('Webhook').item.json.body.correo }}",
+        "additionalFields": {
+          "status": "active"
+        }
+      },
+      "type": "n8n-nodes-base.mailerLite",
+      "typeVersion": 2,
+      "position": [
+        496,
+        320
+      ],
+      "id": "eb41af70-2378-4175-bfe3-e4c977f5e6c7",
+      "name": "Suscripción de Alumnos",
+      "retryOnFail": true,
+      "credentials": {
+        "mailerLiteApi": {
+          "id": "ID_CREDENCIAL_MAILERLITE",
+          "name": "Mailer Lite account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "ID_DOCUMENTO_GOOGLE_SHEETS",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Matriculados 2023 - 2024",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha": "={{ $('Webhook').item.json.body.fecha }}",
+            "Nombre_completo": "={{ $('Webhook').item.json.body.nombre }}",
+            "Estudiante_Nuevo": "={{ $('Webhook').item.json.body.estudiante_nuevo }}",
+            "Programa": "={{ $('Webhook').item.json.body.programa }}",
+            "#Edición": "={{ $('Webhook').item.json.body.edicion }}",
+            "Genero": "={{ $('Webhook').item.json.body.genero }}",
+            "País": "={{ $('Webhook').item.json.body.pais }}",
+            "Ciudad": "={{ $('Webhook').item.json.body.ciudad }}",
+            "Universidad_Estudio": "={{ $('Webhook').item.json.body.universidad_estudio }}",
+            "Nivel_educativo": "={{ $('Webhook').item.json.body.nivel_educativo }}",
+            "Empresa_laboral": "={{ $('Webhook').item.json.body.empresa_laboral }}",
+            "Puesto_rol": "={{ $('Webhook').item.json.body.puesto_rol }}",
+            "Redes_sociales": "={{ $('Webhook').item.json.body.redes_sociales }}",
+            "Edad": "={{ $('Webhook').item.json.body.edad }}",
+            "Laborando": "={{ $('Webhook').item.json.body.laborando }}",
+            "proceso_academico": "={{ $('Webhook').item.json.body.proceso_academico }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre_completo",
+              "displayName": "Nombre_completo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "proceso_academico",
+              "displayName": "proceso_academico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Estudiante_Nuevo",
+              "displayName": "Estudiante_Nuevo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Programa",
+              "displayName": "Programa",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "#Edición",
+              "displayName": "#Edición",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Genero",
+              "displayName": "Genero",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "País",
+              "displayName": "País",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ciudad",
+              "displayName": "Ciudad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Universidad_Estudio",
+              "displayName": "Universidad_Estudio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nivel_educativo",
+              "displayName": "Nivel_educativo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Empresa_laboral",
+              "displayName": "Empresa_laboral",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Puesto_rol",
+              "displayName": "Puesto_rol",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Redes_sociales",
+              "displayName": "Redes_sociales",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Moneda",
+              "displayName": "Moneda",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Edad",
+              "displayName": "Edad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Laborando",
+              "displayName": "Laborando",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -16,
+        320
+      ],
+      "id": "5ee8a4a4-93e8-4e73-a0e5-1e8295a4199e",
+      "name": "BBDD para PowerBI",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ID_CREDENCIAL_SHEETS",
+          "name": "NN Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.proceso_academico }}",
+                    "rightValue": "Matricula Inicial",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "b545f2ad-6ca6-4670-b389-1d4254fbb095"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Matricula Inicial"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "27072b92-a50c-40bd-a8e9-351511795d1f",
+                    "leftValue": "={{ $json.body.proceso_academico }}",
+                    "rightValue": "Pago 2da Cuota",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Pago 2da Cuota"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "dfb13aaa-ff39-4c85-8392-64a6e4d3afae",
+                    "leftValue": "={{ $json.body.proceso_academico }}",
+                    "rightValue": "Pago 3ra Cuota",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Pago 3ra Cuota"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -352,
+        352
+      ],
+      "id": "d56a5e74-1ed1-468b-bcfe-c39292f0fa1f",
+      "name": "Tipo de Proceso"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "groups",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        720,
+        48
+      ],
+      "id": "08627121-88e6-48ee-9c60-6046993e3caa",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "=https://connect.mailerlite.com/api/subscribers/{{ $json.subscriber_id }}/groups/{{ $json.groups }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer TOKEN_JWT_ANONIMIZADO"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Eliminar grupos",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        944,
+        48
+      ],
+      "id": "ac4e0e05-e1ff-4dde-b61e-e8f565e2c955",
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f30ddd92-dd11-4523-9548-3dfb5512d141",
+              "name": "subscriber_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "0a2b0304-d52a-423b-87d0-c1f12331b724",
+              "name": "groups",
+              "value": "={{ $json.groups.map(g => g.id) }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        496,
+        48
+      ],
+      "id": "0fb7e977-058c-4e3d-844d-2e29a6990eee",
+      "name": "Variables"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://connect.mailerlite.com/api/subscribers/{{ $('Verificación de Suscriptores').item.json.id }}/groups/{{ $('Buscar ID de Grupo').item.json['ID Grupo MailerLite'] }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer TOKEN_JWT_ANONIMIZADO"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Nuevo Grupo",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1152,
+        48
+      ],
+      "id": "920209de-5d7e-49bb-87e2-6dd34ce84347",
+      "typeVersion": 4.2,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ID_WEBHOOK_ANONIMO",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -560,
+        368
+      ],
+      "id": "148449e3-6363-43c7-bbf3-773fb70e6c66",
+      "name": "Webhook",
+      "webhookId": "ID_WEBHOOK_ANONIMO",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app13A0YN3t01fNjb",
+          "mode": "list",
+          "cachedResultName": "Academic DB",
+          "cachedResultUrl": "ID_BASE_AIRTABLE"
+        },
+        "table": {
+          "__rl": true,
+          "value": "ID_TABLA_AIRTABLE",
+          "mode": "list",
+          "cachedResultName": "Directorio Grupos MilerLite",
+          "cachedResultUrl": "ID_TABLA_AIRTABLE_URL"
+        },
+        "filterByFormula": "=({programa} = '{{ $json.body.programa }}')",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        160
+      ],
+      "id": "e56bb3ff-2c95-4100-aa10-81a1e6e27010",
+      "name": "Buscar ID de Grupo",
+      "alwaysOutputData": false,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ID_CREDENCIAL_AIRTABLE",
+          "name": "Alegra cash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app13A0YN3t01fNjb",
+          "mode": "list",
+          "cachedResultName": "Academic DB",
+          "cachedResultUrl": "ID_BASE_AIRTABLE"
+        },
+        "table": {
+          "__rl": true,
+          "value": "ID_TABLA_AIRTABLE",
+          "mode": "list",
+          "cachedResultName": "Plantilla correos de bienvenida",
+          "cachedResultUrl": "ID_TABLA_AIRTABLE_URL"
+        },
+        "filterByFormula": "={programa} = \"{{ $json.body.programa }}\"\n",
+        "returnAll": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "97abc227-8a35-4eb5-a69d-290e07c163e9",
+      "name": "Busqueda de Plantilla",
+      "retryOnFail": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ID_CREDENCIAL_AIRTABLE",
+          "name": "Alegra cash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://connect.mailerlite.com/api/subscribers/{{ $('Suscripción de Alumnos').item.json.id }}/groups/{{ $('Buscar ID de Grupo').item.json['ID Grupo MailerLite'] }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer TOKEN_JWT_ANONIMIZADO"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Nuevo Grupo1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        720,
+        320
+      ],
+      "id": "1bd23f1b-397f-41ca-b56b-3a7a790d529e",
+      "typeVersion": 4.2,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "subscriberId": "={{ $('Suscripción de Alumnos').item.json.email }}",
+        "additionalFields": {
+          "customFieldsUi": {
+            "customFieldsValues": [
+              {
+                "fieldId": "name",
+                "value": "={{ $('Webhook').item.json.body.nombre }}"
+              },
+              {
+                "fieldId": "programa",
+                "value": "={{ $('Webhook').item.json.body.programa }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.mailerLite",
+      "typeVersion": 2,
+      "position": [
+        928,
+        320
+      ],
+      "id": "376f5fd7-b9b1-4c8c-8a39-4260979aa5f4",
+      "name": "Update a subscriber",
+      "credentials": {
+        "mailerLiteApi": {
+          "id": "ID_CREDENCIAL_MAILERLITE",
+          "name": "Mailer Lite account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "subscriberId": "={{ $('Webhook').item.json.body.correo }}",
+        "additionalFields": {
+          "customFieldsUi": {
+            "customFieldsValues": [
+              {
+                "fieldId": "name",
+                "value": "={{ $('Webhook').item.json.body.nombre }}"
+              },
+              {
+                "fieldId": "programa",
+                "value": "={{ $('Webhook').item.json.body.programa }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.mailerLite",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        48
+      ],
+      "id": "859e3410-1f30-4022-99c7-56ebef2c653f",
+      "name": "Update a subscriber1",
+      "credentials": {
+        "mailerLiteApi": {
+          "id": "ID_CREDENCIAL_MAILERLITE",
+          "name": "Mailer Lite account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Webhook').item.json.body.correo }}",
+        "subject": "={{ $json['Asunto del Correo'] }}",
+        "message": "={{   $items(\"Busqueda de Plantilla\")[0].json[\"Plantilla HTML\"]     .replace(/\\{\\{nombreEstudiante\\}\\}/g, $items(\"Webhook\")[0].json.body.nombre || \"\")     .replace(/\\{\\{nombreCurso\\}\\}/g, $items(\"Webhook\")[0].json.body.programa || \"\") }}",
+        "options": {
+          "appendAttribution": false,
+          "replyTo": "CORREO_SOPORTE_ANONIMO"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "8cd507e7-f90b-4312-97dc-d51591b5e598",
+      "name": "Send a message",
+      "webhookId": "ID_WEBHOOK_ANONIMO",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ID_CREDENCIAL_GMAIL",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Webhook').item.json.body.correo }}",
+        "subject": "=¡Pago confirmado! Todo listo para continuar 🚀",
+        "message": "=<!DOCTYPE html>\n<html lang=\"es\" xmlns=\"http://www.w3.org/1999/xhtml\">\n\n<head>\n    <meta charset=\"UTF-8\" />\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Confirmación de Pago</title>\n    <style>\n        @media only screen and (max-width:600px) {\n            .container {\n                width: 100% !important\n            }\n            .p-24 {\n                padding: 16px !important\n            }\n            .logo img {\n                max-width: 60% !important\n            }\n        }\n\n        a[x-apple-data-detectors] {\n            color: inherit !important;\n            text-decoration: none !important\n        }\n\n        .container {\n            width: 600px;\n            max-width: 600px;\n            background: #ffffff;\n            border-collapse: collapse\n        }\n\n        .p-24 {\n            padding: 30px\n        }\n\n        .sep {\n            border-top: 1px solid #e6e6e6;\n            height: 1px;\n            line-height: 1px;\n            font-size: 0\n        }\n\n        .title {\n            font: 700 22px/1.3 Arial, sans-serif;\n            color: #1A73E8 !important\n        }\n\n        .text {\n            font: 400 15px/1.6 Arial, sans-serif;\n            color: #333333\n        }\n\n        a {\n            color: #1A73E8 !important;\n            text-decoration: none !important\n        }\n    </style>\n</head>\n\n<body style=\"margin:0;padding:0;background:#f9f9f9\">\n    <div style=\"font-size:12px;line-height:1.4;color:#f9f9f9;mso-hide:all\">\n        Hemos recibido tu pago. Tu cuenta se encuentra al día.\n    </div>\n\n    <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background:#f9f9f9\">\n        <tr>\n            <td align=\"center\" style=\"padding:20px\">\n                <table role=\"presentation\" class=\"container\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n                    <tr>\n                        <td class=\"p-24\">\n\n                            <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n                                <tr>\n                                    <td align=\"right\" class=\"logo\">\n                                        <img src=\"https://storage.googleapis.com/datapath-storage/programas/roadmaps/logo%201en1%20png%20transaprente-10.png\"\n                                            width=\"240\" alt=\"Datapath\"\n                                            style=\"display:block;border:0;width:240px;max-width:50%;height:auto\" />\n                                    </td>\n                                </tr>\n                            </table>\n\n                            <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\n                                style=\"margin-top:8px\">\n                                <tr>\n                                    <td class=\"title\">\n                                        ¡Gracias por ponerte al día, {{ $('Webhook').item.json.body.nombre }}!\n                                    </td>\n                                </tr>\n                            </table>\n\n                            <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\n                                style=\"margin-top:12px\">\n                                <tr>\n                                    <td class=\"text\">\n                                        Queremos informarte que hemos recibido correctamente el pago pendiente asociado a\n                                        tu matrícula en el <strong>{{ $('Webhook').item.json.body.programa }}</strong>.\n                                    </td>\n                                </tr>\n                                <tr>\n                                    <td style=\"height:10px;line-height:10px;font-size:0\">&nbsp;</td>\n                                </tr>\n                                <tr>\n                                    <td class=\"text\">\n                                        Valoramos tu compromiso con tu proceso de formación y nos alegra saber que\n                                        continúas avanzando con nosotros. Tu cuenta se encuentra ahora\n                                        <strong>regularizada</strong>, por lo que puedes seguir participando en el\n                                        programa con total normalidad.\n                                    </td>\n                                </tr>\n                            </table>\n\n                            <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\n                                style=\"margin-top:18px\">\n                                <tr>\n                                    <td class=\"sep\">&nbsp;</td>\n                                </tr>\n                            </table>\n\n                            <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\n                                style=\"margin-top:18px\">\n                                <tr>\n                                    <td class=\"text\">\n                                        Recuerda que cuentas con nuestro acompañamiento durante todo el programa. Si\n                                        tienes alguna duda administrativa o académica, no dudes en escribirnos por los\n                                        canales habituales de comunicación.\n                                    </td>\n                                </tr>\n                            </table>\n\n                            <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\n                                style=\"margin-top:18px\">\n                                <tr>\n                                    <td class=\"text\"\n                                        style=\"color:#555555;font-size:14px;border-left:4px solid #1A73E8;padding-left:12px\">\n                                        “El éxito es la suma de pequeños esfuerzos repetidos día tras día.”\n                                    </td>\n                                </tr>\n                            </table>\n\n                            <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\n                                style=\"margin-top:18px\">\n                                <tr>\n                                    <td class=\"text\">\n                                        Saludos cordiales,<br />\n                                        Equipo Datapath\n                                    </td>\n                                </tr>\n                            </table>\n\n                        </td>\n                    </tr>\n                </table>\n\n                <table role=\"presentation\" width=\"600\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"container\">\n                    <tr>\n                        <td align=\"center\" class=\"text\"\n                            style=\"padding:16px;color:#7d7d7d;font-size:12px\">\n                            © Datapath — Todos los derechos reservados\n                        </td>\n                    </tr>\n                </table>\n\n            </td>\n        </tr>\n    </table>\n</body>\n\n</html>\n",
+        "options": {
+          "appendAttribution": false,
+          "replyTo": "TU_CORREO_DE_SOPORTE_ANONIMO"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        128,
+        448
+      ],
+      "id": "8f2ef29e-1a65-43b6-9bc2-1ebb70be58e5",
+      "name": "Message 2da Cuota",
+      "webhookId": "ID_WEBHOOK_ANONIMO",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ID_CREDENCIAL_GMAIL",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Webhook').item.json.body.correo }}",
+        "subject": "=¡Pago confirmado! Todo listo para continuar 🚀",
+        "message": "=<!DOCTYPE html>\n<html lang=\"es\" xmlns=\"http://www.w3.org/1999/xhtml\">\n\n<head>\n    <meta charset=\"UTF-8\" />\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Confirmación de Pago – Datapath</title>\n    <style>\n        @media only screen and (max-width:600px) {\n            .container {\n                width: 100% !important\n            }\n            .p-24 {\n                padding: 16px !important\n            }\n            .logo img {\n                max-width: 60% !important\n            }\n        }\n\n        a[x-apple-data-detectors] {\n            color: inherit !important;\n            text-decoration: none !important\n        }\n\n        .container {\n            width: 600px;\n            max-width: 600px;\n            background: #ffffff;\n            border-collapse: collapse\n        }\n\n        .p-24 {\n            padding: 30px\n        }\n\n        .sep {\n            border-top: 1px solid #e6e6e6;\n            height: 1px;\n            line-height: 1px;\n            font-size: 0\n        }\n\n        .title {\n            font: 700 22px/1.3 Arial, sans-serif;\n            color: #1A73E8 !important\n        }\n\n        .text {\n            font: 400 15px/1.6 Arial, sans-serif;\n            color: #333333\n        }\n\n        a {\n            color: #1A73E8 !important;\n            text-decoration: none !important\n        }\n    </style>\n</head>\n\n<body style=\"margin:0;padding:0;background:#f9f9f9\">\n    <div style=\"font-size:12px;line-height:1.4;color:#f9f9f9;mso-hide:all\">\n        Hemos recibido tu pago. Tu cuenta se encuentra al día.\n    </div>\n\n    <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background:#f9f9f9\">\n        <tr>\n            <td align=\"center\" style=\"padding:20px\">\n                <table role=\"presentation\" class=\"container\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n                    <tr>\n                        <td class=\"p-24\">\n\n                            <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n                                <tr>\n                                    <td align=\"right\" class=\"logo\">\n                                        <img src=\"https://storage.googleapis.com/datapath-storage/programas/roadmaps/logo%201en1%20png%20transaprente-10.png\"\n                                            width=\"240\" alt=\"Datapath\"\n                                            style=\"display:block;border:0;width:240px;max-width:50%;height:auto\" />\n                                    </td>\n                                </tr>\n                            </table>\n\n                            <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\n                                style=\"margin-top:8px\">\n                                <tr>\n                                    <td class=\"title\">¡Gracias por ponerte al día, {{nombreEstudiante}}!</td>\n                                </tr>\n                            </table>\n\n                            <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\n                                style=\"margin-top:12px\">\n                                <tr>\n                                    <td class=\"text\">\n                                        Queremos informarte que hemos recibido correctamente el pago pendiente asociado a\n                                        tu matrícula en el <strong>{{nombreCurso}}</strong>.\n                                    </td>\n                                </tr>\n                                <tr>\n                                    <td style=\"height:10px;line-height:10px;font-size:0\">&nbsp;</td>\n                                </tr>\n                                <tr>\n                                    <td class=\"text\">\n                                        Valoramos tu compromiso con tu proceso de formación y nos alegra saber que\n                                        continúas avanzando con nosotros. Tu cuenta se encuentra ahora\n                                        <strong>regularizada</strong>, por lo que puedes seguir participando en el\n                                        programa con total normalidad.\n                                    </td>\n                                </tr>\n                            </table>\n\n                            <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\n                                style=\"margin-top:18px\">\n                                <tr>\n                                    <td class=\"sep\">&nbsp;</td>\n                                </tr>\n                            </table>\n\n                            <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\n                                style=\"margin-top:18px\">\n                                <tr>\n                                    <td class=\"text\">\n                                        Recuerda que cuentas con nuestro acompañamiento durante todo el programa. Si\n                                        tienes alguna duda administrativa o académica, no dudes en escribirnos por los\n                                        canales habituales de comunicación.\n                                    </td>\n                                </tr>\n                            </table>\n\n                            <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\n                                style=\"margin-top:18px\">\n                                <tr>\n                                    <td class=\"text\"\n                                        style=\"color:#555555;font-size:14px;border-left:4px solid #1A73E8;padding-left:12px\">\n                                        “El éxito es la suma de pequeños esfuerzos repetidos día tras día.”\n                                    </td>\n                                </tr>\n                            </table>\n\n                            <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\n                                style=\"margin-top:18px\">\n                                <tr>\n                                    <td class=\"text\">\n                                        Saludos cordiales,<br />\n                                        Equipo Datapath\n                                    </td>\n                                </tr>\n                            </table>\n\n                        </td>\n                    </tr>\n                </table>\n\n                <table role=\"presentation\" width=\"600\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"container\">\n                    <tr>\n                        <td align=\"center\" class=\"text\"\n                            style=\"padding:16px;color:#7d7d7d;font-size:12px\">\n                            © Datapath — Todos los derechos reservados\n                        </td>\n                    </tr>\n                </table>\n\n            </td>\n        </tr>\n    </table>\n</body>\n\n</html>\n",
+        "options": {
+          "appendAttribution": false,
+          "replyTo": "TU_CORREO_DE_SOPORTE_ANONIMO"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        128,
+        608
+      ],
+      "id": "fd1c9d92-2146-472d-ae61-cf5889674e75",
+      "name": "Message 3da Cuota",
+      "webhookId": "ID_WEBHOOK_ANONIMO",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ID_CREDENCIAL_GMAIL",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Verificación de Suscriptores": {
+      "main": [
+        [
+          {
+            "node": "Variables",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Suscripción de Alumnos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Suscripción de Alumnos": {
+      "main": [
+        [
+          {
+            "node": "Nuevo Grupo1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tipo de Proceso": {
+      "main": [
+        [
+          {
+            "node": "BBDD para PowerBI",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Buscar ID de Grupo",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Busqueda de Plantilla",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message 2da Cuota",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message 3da Cuota",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Eliminar grupos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Eliminar grupos": {
+      "main": [
+        [
+          {
+            "node": "Nuevo Grupo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Variables": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nuevo Grupo": {
+      "main": [
+        [
+          {
+            "node": "Update a subscriber1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Tipo de Proceso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar ID de Grupo": {
+      "main": [
+        [
+          {
+            "node": "Verificación de Suscriptores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busqueda de Plantilla": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nuevo Grupo1": {
+      "main": [
+        [
+          {
+            "node": "Update a subscriber",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e4acd610-ef8b-4de9-a74b-0ef37b470110",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "INSTANCIA_REMPLAZAR"
+  },
+  "id": "Q6UM13eJqAyDzPqX",
+  "tags": [
+    {
+      "name": "Matriculados",
+      "id": "gtSP1dYOLw8Fu4z3",
+      "createdAt": "2026-02-22T14:23:28.743Z",
+      "updatedAt": "2026-02-22T14:23:28.743Z"
+    },
+    {
+      "createdAt": "2025-09-07T23:47:18.016Z",
+      "updatedAt": "2025-09-07T23:47:18.016Z",
+      "id": "xjdOU106gDpmv4Gp",
+      "name": "Airtable"
+    },
+    {
+      "name": "Email",
+      "id": "eT0VwTEBqD7IoKGr",
+      "createdAt": "2026-02-22T14:23:28.754Z",
+      "updatedAt": "2026-02-22T14:23:28.754Z"
+    },
+    {
+      "name": "Milerlite",
+      "id": "w1aMapDV3RHydI0E",
+      "createdAt": "2026-02-22T14:23:28.750Z",
+      "updatedAt": "2026-02-22T14:23:28.750Z"
+    }
+  ]
+}

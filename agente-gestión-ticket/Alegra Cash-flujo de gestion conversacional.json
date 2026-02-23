@@ -1,0 +1,2879 @@
+{
+  "name": "Alegra Cash - flujo de gestión conversacional",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appG3yTiOUZrnggci",
+          "mode": "list",
+          "cachedResultName": "ALEGRA-CASH Gestión",
+          "cachedResultUrl": "https://airtable.com/TU_BASE_DE_DATOS"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblIFbsrY3b4QJXEl",
+          "mode": "list",
+          "cachedResultName": "Analistas",
+          "cachedResultUrl": "https://airtable.com/TU_ID_DE_BASE/TU_ID_DE_TABLA"
+        },
+        "filterByFormula": "=AND( {Vertical} = '{{ $json.fields.Vertical }}', {En turno} = 1 )",
+        "returnAll": false,
+        "limit": 1,
+        "options": {},
+        "sort": {
+          "property": [
+            {
+              "field": "Carga actual"
+            }
+          ]
+        }
+      },
+      "id": "7fe00470-570c-400b-96ff-38e133bbf67e",
+      "name": "Buscar Analista Ideal",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        -16,
+        128
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ezv5BIimzUR18MRg",
+          "name": "Alegra cash"
+        }
+      },
+      "notes": "Busca: Misma Vertical + En Turno. Ordena por: Menor carga primero."
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "responseNodes"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1600,
+        -144
+      ],
+      "id": "ceff6653-14ec-45a3-801e-a4b0f31be5e1",
+      "name": "When chat message received",
+      "webhookId": "e85a33e4-c15f-4041-a4a2-7f7810ee4088"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1264,
+        16
+      ],
+      "id": "dd555c05-5ac9-4efd-abd8-0b9fb699c436",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "cFa64Rg3uKe0m8H4",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -1120,
+        16
+      ],
+      "id": "5c73994c-06a8-4105-8619-ab27f933fa0e",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "70602f98-b402-46e9-829f-ea5ecb07ebb1",
+                    "leftValue": "={{ $json.fields.Vertical }}",
+                    "rightValue": "Soporte de cuenta",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Soporte Cuenta"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "16ac0129-890b-4d2e-beb6-3172e80b7262",
+                    "leftValue": "={{ $json.fields.Vertical }}",
+                    "rightValue": "Préstamos",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Préstamos"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1f9718d9-e7df-4fc7-9e47-38649cc2decd",
+                    "leftValue": "={{ $json.fields.Vertical }}",
+                    "rightValue": "Cobranzas y pagos",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Cobranzas"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -240,
+        -208
+      ],
+      "id": "2bcc355b-fdf9-4a95-a6fa-304fe4705f87",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('chatInput 1').item.json.chatInput }} || {{ $('Datos completos').item.json.reply_to_user }}\n",
+        "options": {
+          "systemMessage": "Eres Alee, el asistente virtual de soporte de ALEGRA-CASH.\n\nTu tarea es ayudar amablemente al usuario a recuperar el acceso a su cuenta, guiándolo paso a paso.\n\nSigue esta estructura de conversación:\n1. Empieza reconociendo el problema y mostrando empatía.\n2. Explica cómo restablecer su contraseña paso a paso en la plataforma (por ejemplo: “Haz clic en ‘¿Olvidaste tu contraseña?’ en la página de inicio de sesión…”).\n3. Da recomendaciones sobre cómo crear una contraseña segura (ej. mínimo 8 caracteres, mayúsculas, números y símbolos).\n4. Pregunta si logró acceder correctamente o si aún necesita ayuda.\n\nTu respuesta debe ser natural, cálida y en español latinoamericano.\nNo devuelvas JSON, solo texto conversacional.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        48,
+        -256
+      ],
+      "id": "17faefb5-272d-489c-91f5-400835d8a3ee",
+      "name": "Bot Contraseña"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9cdceb28-79ab-4c89-b8f0-a5247fe666f8",
+              "name": "chatInput",
+              "value": "={{ $json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1408,
+        -144
+      ],
+      "id": "f9394be6-ec55-4306-8e1d-9ffbbf2ed910",
+      "name": "chatInput 1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        176,
+        -32
+      ],
+      "id": "ad4e7423-a8a1-41bd-9371-bf01959c5e87",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "cFa64Rg3uKe0m8H4",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        320,
+        -32
+      ],
+      "id": "3f8779ca-1c38-49ca-85dc-3dc1b1adbb63",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.output }}",
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "resumeUnit": "minutes"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        400,
+        -256
+      ],
+      "id": "dd7a95e4-e5f8-4f86-aa41-81fc9de40271",
+      "name": "Respond to Chat"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n\n  \"output\": \"Gracias por ayudarnos a ser mejor. Que tengas buen día🚀.\"\n\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1632,
+        -304
+      ],
+      "id": "b86131e1-c5c6-48eb-b4c6-a3991d03fcb0",
+      "name": "Agradecimiento"
+    },
+    {
+      "parameters": {
+        "message": "Parece que todo está en orden. Cierro el caso por ahora. Ha sido un placer asistirte con tu solicitud.\n\nPara ayudarnos a mejorar, por favor califica este servicio respondiendo con un número de 1 ⭐ a 5 ⭐ (donde 5 es excelente).\n",
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "resumeUnit": "minutes"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        912,
+        -208
+      ],
+      "id": "fef36107-71ec-4c17-85ed-8d61f398c490",
+      "name": "Encuesta",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"output\": \"Cierro la conversación por inactividad. Si vuelves a necesitar ayuda en el futuro, no dudes en escribirnos de nuevo.\\n\\n¡Hasta pronto! 🚀\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1632,
+        -128
+      ],
+      "id": "30e25a4f-20e3-46bb-9c69-d97438baaeef",
+      "name": "Cierre"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1eeb2c14-ae93-4f10-9b38-112f6abe56ec",
+              "leftValue": "={{ $json.chatInput && $json.chatInput.length > 0 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1104,
+        -208
+      ],
+      "id": "2e8026ca-3a21-4704-badc-659e06a2d791",
+      "name": "Respondió?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1eeb2c14-ae93-4f10-9b38-112f6abe56ec",
+              "leftValue": "={{ $json.chatInput && $json.chatInput.length > 0 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        608,
+        -256
+      ],
+      "id": "02ee4bdb-11ff-4101-bb4b-a80681569b9e",
+      "name": "Confirma cambio?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "949e6b12-ddbf-4572-b6a9-1543987c22b8",
+              "leftValue": "={{ $json.chatInput }}",
+              "rightValue": "si",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        832,
+        -480
+      ],
+      "id": "9eae6a29-4bb9-4358-b4c6-a08d0bf7e97a",
+      "name": "Funcionó?"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n\n  \"output\": \"Gracias por ayudarnos a ser mejor. Que tengas buen día🚀.\"\n\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1808,
+        -704
+      ],
+      "id": "c5c4636b-03ab-4ed0-8a08-4445c9ef62fe",
+      "name": "Agradecimiento1"
+    },
+    {
+      "parameters": {
+        "message": "¡Qué buena noticia! 🎉 Me alegra mucho que hayas recuperado el acceso a tu cuenta.\n\n¿Podrías regalarme una calificación de mi atención? \nEscribe un número del 1 ⭐ al 5 ⭐, siendo 5 excelente\n\n\n",
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "resumeUnit": "minutes"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        1024,
+        -624
+      ],
+      "id": "e7cbe2fa-4a36-47ac-bdaa-e0751dd2b3c8",
+      "name": "Encuesta1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"output\": \"Cierro la conversación por inactividad. Si vuelves a necesitar ayuda en el futuro, no dudes en escribirnos de nuevo.\\n\\n¡Hasta pronto! 🚀\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1824,
+        -544
+      ],
+      "id": "39cfebc1-3150-4909-bec5-2afb84e489a8",
+      "name": "Cierre1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1eeb2c14-ae93-4f10-9b38-112f6abe56ec",
+              "leftValue": "={{ $json.chatInput && $json.chatInput.length > 0 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1232,
+        -624
+      ],
+      "id": "92689cea-9d94-4e8e-97f0-7b0d781c54a1",
+      "name": "Respondió?."
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Eres **Albot**, el asistente inteligente y amable de soporte de \"ALEGRA-CASH\".  \nTu misión es guiar al cliente de forma cordial y profesional para clasificar su solicitud correctamente.  \nSiempre saluda con amabilidad y preséntate antes de pedir información.  \nTu tono es empático, cálido y breve, sin perder precisión.\n\n---\n\n🎯 OBJETIVOS PRINCIPALES:\n\n1. Identificar la **Vertical** correcta según el mensaje del usuario.  \n2. Obtener o recordar su **ID (userId)**.  \n3. Devolver SIEMPRE la respuesta en formato **JSON**.  \n\n---\n\n🧠 **REGLA DE MEMORIA**  \nAntes de responder, revisa el historial de conversación.  \nSi el usuario ya dio su ID en un mensaje anterior, **NO lo vuelvas a pedir**.  \nSolo pide la información que falta.\n\n---\n\n💬 **VERTICALES PERMITIDAS Y PALABRAS CLAVE**\n\n1. **\"Soporte de cuenta\"**  \n   - Palabras: contraseña, clave, acceso, login, entrar, usuario, bloqueado, correo, error, cuenta, recuperar, ingresar.  \n   - Regla: Si menciona dificultad de acceso o ingreso, es \"Soporte Cuenta\".\n\n2. **\"Préstamos\"**  \n   - Palabras: préstamo, crédito, dinero, solicitud, desembolso, monto, cupo, solicitar, estado.  \n   - Regla: Si habla de pedir, recibir o revisar dinero prestado, es \"Prestamos\".\n\n3. **\"Cobranzas y pagos\"**  \n   - Palabras: deuda, pagar, cobro, atrasado, cuota, vencido, paz y salvo, recordatorio.  \n   - Regla: Si habla de pagos pendientes o deudas, es \"Cobranzas y pagos\".\n\n4. **\"Otro\"**  \n   - Si el mensaje solo es un saludo (“Hola”, “Buenos días”) o no encaja en ninguna categoría anterior.\n\n---\n\n⚙️ **LOGICA DE DATOS FALTANTES**\n\n- `missing_info = true` si falta el ID **o** la vertical es \"Otro\".  \n- `missing_info = false` solo si ya tienes el ID (detectado o recordado) **y** una vertical válida (Soporte de cuenta, Préstamos, Cobranzas y pagos).  \n- Si falta información, pide amablemente lo que falta (sin repetir datos ya confirmados).\n\n---\n\n🧩 **FORMATO JSON OBLIGATORIO**\n\nDevuelve **únicamente** este objeto:\n\n{\n  \"userId\": \"El número de identificación o null si no lo tienes\",\n  \"vertical\": \"Soporte de cuenta\" | \"Préstamos\" | \"Cobranzas y pagos\" | \"Otro\",\n  \"missing_info\": true | false,\n  \"reply_to_user\": \"Tu mensaje al cliente (amable, con saludo si es la primera interacción)\"\n}\n\n---\n\n🤖 **EJEMPLOS DE COMPORTAMIENTO**\n\nEjemplo 1️⃣ – Primer mensaje del cliente:\nUsuario: \"Hola\"\nSalida:\n{\n  \"userId\": null,\n  \"vertical\": \"Otro\",\n  \"missing_info\": true,\n  \"reply_to_user\": \"¡Hola! Soy Alee, asistente virtual de soporte de Alegra Cash 😊. Para una mejor atención, por favor indícame tu número de identificación.\"\n}\n\nEjemplo 2️⃣ – Usuario da su ID:\nUsuario: \"Mi cédula es 1020345678\"\nSalida:\n{\n  \"userId\": \"1020345678\",\n  \"vertical\": \"Otro\",\n  \"missing_info\": true,\n  \"reply_to_user\": \"¡Perfecto, gracias! Ahora cuéntame en qué puedo ayudarte\"\n}\n\nEjemplo 3️⃣ – Usuario dice su problema sin ID:\nUsuario: \"No puedo entrar a mi cuenta\"\nSalida:\n{\n  \"userId\": null,\n  \"vertical\": \"Soporte de cuenta\",\n  \"missing_info\": true,\n  \"reply_to_user\": \"Hola 👋. Vamos a revisarlo. ¿Me compartes tu número de identificación para ayudarte con el acceso?\"\n}\n\nEjemplo 4️⃣ – Usuario con ambos datos:\nUsuario: \"Mi cédula es 1020345678 y olvidé mi clave\"\nSalida:\n{\n  \"userId\": \"1020345678\",\n  \"vertical\": \"Soporte de cuenta\",\n  \"missing_info\": false,\n  \"reply_to_user\": \"Gracias por la información. Te ayudo ahora mismo con el acceso a tu cuenta.\"\n}\n\nEjemplo 5️⃣ – Usuario existente, nuevo mensaje:\nUsuario: \"Ahora quiero consultar mi préstamo\"\nSalida:\n{\n  \"userId\": \"1020345678\",\n  \"vertical\": \"Préstamos\",\n  \"missing_info\": false,\n  \"reply_to_user\": \"Claro, te ayudo con ello. ¿Qué te gustaría consultar sobre tu préstamo?\"\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -1232,
+        -144
+      ],
+      "id": "7620d35b-475f-44ac-a823-81a0a36a6f64",
+      "name": "Extracción de Datos"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appG3yTiOUZrnggci",
+          "mode": "list",
+          "cachedResultName": "ALEGRA-CASH Gestión",
+          "cachedResultUrl": "https://airtable.com/TU_BASE_DE_DATOS"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl2CsEnwRcA6UJq6",
+          "mode": "list",
+          "cachedResultName": "Clientes",
+          "cachedResultUrl": "https://airtable.com/TU_ID_DE_BASE/TU_ID_DE_TABLA"
+        },
+        "filterByFormula": "={ID_DNI} = '{{ $json.userId }}'",
+        "returnAll": false,
+        "limit": 1,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -592,
+        -176
+      ],
+      "id": "8876751d-08d2-45b2-aced-d65f336e41e2",
+      "name": "Search records",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ezv5BIimzUR18MRg",
+          "name": "Alegra cash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "message": "={{ $('Code1').item.json.reply_to_user }}",
+        "waitUserReply": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        -544,
+        64
+      ],
+      "id": "496d50de-f0e9-43ba-97cc-3461efde01be",
+      "name": "Respond to Chat1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Obtenemos la respuesta de la IA\nconst aiResponse = JSON.parse($input.first().json.output || \"{}\");\nlet vertical = aiResponse.vertical || \"Otro\";\nlet missing_info = aiResponse.missing_info;\nconst userId = aiResponse.userId || null;\n\n// 2. Obtenemos lo que escribió el usuario (Referencia segura al nodo anterior)\n// Asegúrate de que 'chatInput 1' sea el nombre exacto de tu nodo manual\nconst chatText = $('chatInput 1').item.json.chatInput.toLowerCase();\n\n// 3. Corrección manual de Vertical (Tu lógica)\nif (vertical === \"Otro\" || vertical === \"Otros\") {\n  if (chatText.includes(\"cuenta\") || chatText.includes(\"clave\") || chatText.includes(\"acceder\") || chatText.includes(\"ingresar\") || chatText.includes(\"contraseña\")) {\n    vertical = \"Soporte de cuenta\";\n  } else if (chatText.includes(\"préstamo\") || chatText.includes(\"dinero\") || chatText.includes(\"crédito\")) {\n    vertical = \"Préstamos\";\n  } else if (chatText.includes(\"cobranza\") || chatText.includes(\"pago\") || chatText.includes(\"deuda\")) {\n    vertical = \"Cobranzas y pagos\";\n  }\n}\n\n// 4. LA CLAVE: Si ya tenemos ID y Vertical, forzamos el éxito\nif (userId && vertical !== \"Otro\") {\n   missing_info = false;\n}\n\nreturn {\n  userId: userId,\n  vertical: vertical,\n  missing_info: missing_info,\n  reply_to_user: aiResponse.reply_to_user\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        -144
+      ],
+      "id": "96ed2988-741b-4374-80ed-d6be96c26880",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0718b3a2-b2cc-498c-b03a-a2ab4a13f060",
+              "leftValue": "={{ $json.missing_info }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -800,
+        -144
+      ],
+      "id": "21fd4612-e21b-47a1-8d7c-c0ec24adcf31",
+      "name": "Datos completos"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appG3yTiOUZrnggci",
+          "mode": "list",
+          "cachedResultName": "ALEGRA-CASH Gestión",
+          "cachedResultUrl": "https://airtable.com/TU_BASE_DE_DATOS"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblVkKGxR5yp0lcf4",
+          "mode": "list",
+          "cachedResultName": "Tickets",
+          "cachedResultUrl": "https://airtable.com/TU_ID_DE_BASE/TU_ID_DE_TABLA"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Link a Cliente": "={{ [ $json.id ] }}",
+            "Estado": "Pendiente",
+            "Vertical": "={{ $('Code1').item.json.vertical }}",
+            "Prioridad de Atención": "={{ $('Search records').item.json['Tipo de usuario'] == 'Pro' ? 'Alta' : 'Normal' }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Fecha Creación",
+              "displayName": "Fecha Creación",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Link a Cliente",
+              "displayName": "Link a Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Prioridad de Atención",
+              "displayName": "Prioridad de Atención",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Alta",
+                  "value": "Alta"
+                },
+                {
+                  "name": "Normal",
+                  "value": "Normal"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Responsable",
+              "displayName": "Responsable",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Vertical",
+              "displayName": "Vertical",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Soporte de cuenta",
+                  "value": "Soporte de cuenta"
+                },
+                {
+                  "name": "Préstamos",
+                  "value": "Préstamos"
+                },
+                {
+                  "name": "Cobranzas y pagos",
+                  "value": "Cobranzas y pagos"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Abierto",
+                  "value": "Abierto"
+                },
+                {
+                  "name": "Escalado",
+                  "value": "Escalado"
+                },
+                {
+                  "name": "Pendiente",
+                  "value": "Pendiente"
+                },
+                {
+                  "name": "Resuelto",
+                  "value": "Resuelto"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Calificación Atención",
+              "displayName": "Calificación Atención",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -416,
+        -176
+      ],
+      "id": "1a1481dd-5ecb-4a20-8e1e-8564459d993f",
+      "name": "Crear Ticket",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ezv5BIimzUR18MRg",
+          "name": "Alegra cash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Buscar Analista Ideal').item.json.Email }}",
+        "subject": "🔔 Atención Requerida: Ticket de Prioridad Alta para Gestionar",
+        "message": "=<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n  <meta charset=\"UTF-8\" />\n  <title>Nuevo ticket de alta prioridad</title>\n</head>\n\n<body style=\"margin:0;padding:0;background-color:#f5f7fa;font-family:Arial,Helvetica,sans-serif;\">\n\n  <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color:#f5f7fa;padding:20px 0;\">\n    <tr>\n      <td align=\"center\">\n\n        <table width=\"600\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color:#ffffff;border-radius:8px;overflow:hidden;border:1px solid #e0e4ec;\">\n\n          <!-- Header -->\n          <tr>\n            <td style=\"background-color:#00bfa5;padding:16px 24px;\">\n              <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">\n                <tr>\n                  <td align=\"left\">\n                    <img src=\"https://i.imghippo.com/files/vxTa1244AMM.webp\" alt=\"Alegra-Cash\" style=\"height:32px;display:block;\">\n                  </td>\n                  <td align=\"right\" style=\"color:#ffffff;font-size:13px;\">\n                    Customer Experience · Alegra-Cash\n                  </td>\n                </tr>\n              </table>\n            </td>\n          </tr>\n\n          <!-- Título -->\n          <tr>\n            <td style=\"padding:24px 24px 8px 24px;\">\n              <h1 style=\"margin:0;font-size:20px;color:#4b4b4d;\">\n                Nuevo ticket asignado · <span style=\"color:#e53935;\">Prioridad Alta</span>\n              </h1>\n            </td>\n          </tr>\n\n          <!-- Saludo -->\n          <tr>\n            <td style=\"padding:0 24px 8px 24px;font-size:14px;color:#4b4b4d;line-height:1.5;\">\n              <p style=\"margin:0 0 8px 0;\">Hola <strong>{{ $('Search records').item.json['Nombre Cliente'] }}</strong>,</p>\n              <p style=\"margin:0 0 8px 0;\">\n                Se te ha asignado un nuevo ticket de <strong>alta prioridad</strong> para gestionar la solicitud de uno de nuestros clientes.\n              </p>\n            </td>\n          </tr>\n\n          <!-- Datos del ticket -->\n          <tr>\n            <td style=\"padding:8px 24px 16px 24px;\">\n              <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"border-collapse:collapse;font-size:13px;color:#4b4b4d;\">\n\n                <tr>\n                  <td colspan=\"2\" style=\"padding:8px 0;\"><strong>Detalles del ticket</strong></td>\n                </tr>\n\n                <tr>\n                  <td width=\"35%\" style=\"padding:4px 0;color:#777777;\">ID Ticket:</td>\n                  <td style=\"padding:4px 0;\"><strong>{{ $('Crear Ticket').item.json.id }}</strong></td>\n                </tr>\n\n                <tr>\n                  <td style=\"padding:4px 0;color:#777777;\">Vertical:</td>\n                  <td style=\"padding:4px 0;\">{{ $('Crear Ticket').item.json.fields.Vertical }}</td>\n                </tr>\n\n                <tr>\n                  <td style=\"padding:4px 0;color:#777777;\">Fecha de creación:</td>\n                  <td style=\"padding:4px 0;\">{{ $('Act. asignación ticket y estado').item.json.fields['Fecha Creación'] }}</td>\n                </tr>\n\n                <tr>\n                  <td style=\"padding:4px 0;color:#777777;\">Nivel de prioridad:</td>\n                  <td style=\"padding:4px 0;\">\n                    <span style=\"background-color:#fdecea;color:#e53935;padding:2px 8px;border-radius:12px;font-size:12px;\">\n                      Alta\n                    </span>\n                  </td>\n                </tr>\n\n              </table>\n            </td>\n          </tr>\n\n          <!-- Datos del cliente -->\n          <tr>\n            <td style=\"padding:0 24px 16px 24px;\">\n              <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"border-collapse:collapse;font-size:13px;color:#4b4b4d;\">\n\n                <tr>\n                  <td colspan=\"2\" style=\"padding:8px 0;\"><strong>Datos del cliente</strong></td>\n                </tr>\n\n                <tr>\n                  <td width=\"35%\" style=\"padding:4px 0;color:#777777;\">Nombre:</td>\n                  <td style=\"padding:4px 0;\"><strong>{{ $('Search records').item.json['Nombre Cliente'] }}</strong></td>\n                </tr>\n\n                <tr>\n                  <td style=\"padding:4px 0;color:#777777;\">Tipo de usuario:</td>\n                  <td style=\"padding:4px 0;\">{{ $('Search records').item.json['Tipo de usuario'] }}</td>\n                </tr>\n\n                <tr>\n                  <td style=\"padding:4px 0;color:#777777;\">País:</td>\n                  <td style=\"padding:4px 0;\">{{ $('Search records').item.json['País usuario'] }}</td>\n                </tr>\n\n                <tr>\n                  <td style=\"padding:4px 0;color:#777777;\">Correo:</td>\n                  <td style=\"padding:4px 0;\">{{ $('Search records').item.json.Email }}</td>\n                </tr>\n\n                <!-- NUEVO: Teléfono -->\n                <tr>\n                  <td style=\"padding:4px 0;color:#777777;\">Teléfono:</td>\n                  <td style=\"padding:4px 0;\">{{ $('Search records').item.json['Teléfono'] }}</td>\n                </tr>\n\n              </table>\n            </td>\n          </tr>\n\n          <!-- CTA -->\n          <tr>\n            <td style=\"padding:0 24px 24px 24px;font-size:14px;color:#4b4b4d;line-height:1.5;\">\n              <p style=\"margin:0 0 12px 0;\">\n                Te recomendamos dar respuesta a este caso lo antes posible para mantener nuestros tiempos de atención dentro del SLA comprometido.\n              </p>\n\n              <p style=\"margin:0 0 16px 0;\" align=\"center\"></p>\n\n              <p style=\"margin:0;font-size:12px;color:#777777;\">\n                Si consideras que este ticket debe ser reasignado o no corresponde a tu vertical, por favor coordina con tu líder de equipo.\n              </p>\n            </td>\n          </tr>\n\n          <!-- Footer -->\n          <tr>\n            <td style=\"background-color:#f5f7fa;padding:12px 24px;text-align:center;font-size:11px;color:#999999;\">\n              © 2024 Alegra Cash · Equipo de Customer Experience\n            </td>\n          </tr>\n\n        </table>\n\n      </td>\n    </tr>\n  </table>\n\n</body>\n</html>\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        384,
+        128
+      ],
+      "id": "5827e72d-7a9a-4e64-aa6f-76fee5c651f6",
+      "name": "Notificación Analista",
+      "webhookId": "247eb652-09d1-4dc3-bc92-44841580362c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "WSamvukO192Op9AZ",
+          "name": "Gmail account FannRods"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "message": "={{ $('Search records').item.json['Nombre Cliente'] }}, hemos activado atención prioritaria para tu caso conforme a tu categoría {{ $('Search records').item.json['Tipo de usuario'] }}.\n\n{{ $('Buscar Analista Ideal').item.json.Nombre }} ha sido designado para atenderte de manera personalizada y asegurar una respuesta rápida y acorde a tu categoría.",
+        "waitUserReply": "={{ false }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        848,
+        64
+      ],
+      "id": "b3d39f01-95a8-4efd-806f-67f05f2a5bdf",
+      "name": "Respond to Chat2"
+    },
+    {
+      "parameters": {
+        "amount": 20
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1136,
+        144
+      ],
+      "id": "c0d98311-8d4f-4ab5-9daf-81f3420f3d9e",
+      "name": "Wait",
+      "webhookId": "4411cb8a-6429-4f48-b04c-555b9fb75f11"
+    },
+    {
+      "parameters": {
+        "message": "=Hola, soy {{ $('Buscar Analista Ideal').item.json.Nombre }}. Ya he dado solución a tu requerimiento. \n\n✅ Para ayudarnos a mejorar, por favor califica este servicio respondiendo con un número de 1 ⭐ a 5 ⭐ (donde 5 es excelente).",
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "resumeUnit": "minutes"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        144
+      ],
+      "id": "22c79c34-e442-4a0c-b847-562a8f1fcb7d",
+      "name": "La Solución + Encuesta"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n\n  \"output\": \"Gracias por ayudarnos a ser mejor. Que tengas buen día🚀.\"\n\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2000,
+        64
+      ],
+      "id": "23c25103-eced-4be3-8d82-5961c8635681",
+      "name": "Agradecimiento2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1eeb2c14-ae93-4f10-9b38-112f6abe56ec",
+              "leftValue": "={{ $json.chatInput && $json.chatInput.length > 0 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1552,
+        144
+      ],
+      "id": "390c077a-2c86-4d13-adde-e46adaebd6b8",
+      "name": "Respondió?1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appG3yTiOUZrnggci",
+          "mode": "list",
+          "cachedResultName": "ALEGRA-CASH Gestión",
+          "cachedResultUrl": "https://airtable.com/TU_BASE_DE_DATOS"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblVkKGxR5yp0lcf4",
+          "mode": "list",
+          "cachedResultName": "Tickets",
+          "cachedResultUrl": "https://airtable.com/TU_ID_DE_BASE/TU_ID_DE_TABLA"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Estado": "Resuelto",
+            "id": "={{ $('Crear Ticket').item.json.id }}",
+            "Calificación Atención": "={{ $json.chatInput }}",
+            "Fecha Resolución": "={{ $now }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha Creación",
+              "displayName": "Fecha Creación",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Link a Cliente",
+              "displayName": "Link a Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Prioridad de Atención",
+              "displayName": "Prioridad de Atención",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Alta",
+                  "value": "Alta"
+                },
+                {
+                  "name": "Normal",
+                  "value": "Normal"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Responsable",
+              "displayName": "Responsable",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Vertical",
+              "displayName": "Vertical",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Soporte de cuenta",
+                  "value": "Soporte de cuenta"
+                },
+                {
+                  "name": "Préstamos",
+                  "value": "Préstamos"
+                },
+                {
+                  "name": "Cobranzas y pagos",
+                  "value": "Cobranzas y pagos"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Abierto",
+                  "value": "Abierto"
+                },
+                {
+                  "name": "Escalado",
+                  "value": "Escalado"
+                },
+                {
+                  "name": "Pendiente",
+                  "value": "Pendiente"
+                },
+                {
+                  "name": "Resuelto",
+                  "value": "Resuelto"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Calificación Atención",
+              "displayName": "Calificación Atención",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Fecha Resolución",
+              "displayName": "Fecha Resolución",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Tiempo resolución",
+              "displayName": "Tiempo resolución",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "252d9f34-3648-4bea-a5a5-c76a18206360",
+      "name": "Cierre Final1",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        1808,
+        224
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ezv5BIimzUR18MRg",
+          "name": "Alegra cash"
+        }
+      },
+      "notes": "Aquí simulas que el Bot lo resuelve y cierras el ticket."
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"output\": \"Cierro la conversación por inactividad. Si vuelves a necesitar ayuda en el futuro, no dudes en escribirnos de nuevo.\\n\\n¡Hasta pronto! 🚀\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2000,
+        224
+      ],
+      "id": "2b85a967-6249-42b5-8b5a-bc3c116a7410",
+      "name": "Cierre2"
+    },
+    {
+      "parameters": {
+        "message": "={{ $('Search records').item.json.fields['Nombre Cliente'] }}, gracias por comunicarte con nosotros. Tu solicitud ya fue asignada al especialista que podrá ayudarte mejor.\n\n{{ $('Buscar Analista Ideal').item.json.Name }} revisará los detalles y te dará una respuesta en breve.\n",
+        "waitUserReply": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        864,
+        224
+      ],
+      "id": "2ac6be89-d614-4f2f-a13d-27feb58e349a",
+      "name": "Respond to Chat3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e8b59fc3-20ee-45ec-9b64-18bd5ceceb39",
+              "leftValue": "={{ $('Search records').item.json['Tipo de usuario'] }}",
+              "rightValue": "Pro",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        576,
+        128
+      ],
+      "id": "75fb2ad4-3766-4219-81f4-aa93a8f00e1f",
+      "name": "Nivel"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appG3yTiOUZrnggci",
+          "mode": "list",
+          "cachedResultName": "ALEGRA-CASH Gestión",
+          "cachedResultUrl": "https://airtable.com/TU_BASE_DE_DATOS"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblVkKGxR5yp0lcf4",
+          "mode": "list",
+          "cachedResultName": "Tickets",
+          "cachedResultUrl": "https://airtable.com/TU_ID_DE_BASE/TU_ID_DE_TABLA"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Calificación Atención": "={{ $json.chatInput }}",
+            "Responsable": "={{ ['recnSYvNXBcGOpU0U'] }}",
+            "Estado": "Resuelto",
+            "Fecha Resolución": "={{ $now }}",
+            "id": "={{ $('Crear Ticket').item.json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha Creación",
+              "displayName": "Fecha Creación",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Link a Cliente",
+              "displayName": "Link a Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Prioridad de Atención",
+              "displayName": "Prioridad de Atención",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Alta",
+                  "value": "Alta"
+                },
+                {
+                  "name": "Normal",
+                  "value": "Normal"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Responsable",
+              "displayName": "Responsable",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Vertical",
+              "displayName": "Vertical",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Soporte de cuenta",
+                  "value": "Soporte de cuenta"
+                },
+                {
+                  "name": "Préstamos",
+                  "value": "Préstamos"
+                },
+                {
+                  "name": "Cobranzas y pagos",
+                  "value": "Cobranzas y pagos"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Abierto",
+                  "value": "Abierto"
+                },
+                {
+                  "name": "Escalado",
+                  "value": "Escalado"
+                },
+                {
+                  "name": "Pendiente",
+                  "value": "Pendiente"
+                },
+                {
+                  "name": "Resuelto",
+                  "value": "Resuelto"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Calificación Atención",
+              "displayName": "Calificación Atención",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Fecha Resolución",
+              "displayName": "Fecha Resolución",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Tiempo resolución",
+              "displayName": "Tiempo resolución",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1536,
+        -752
+      ],
+      "id": "681a1c0f-c6a7-4bb1-8179-dd45fcd09289",
+      "name": "Update record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ezv5BIimzUR18MRg",
+          "name": "Alegra cash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appG3yTiOUZrnggci",
+          "mode": "list",
+          "cachedResultName": "ALEGRA-CASH Gestión",
+          "cachedResultUrl": "https://airtable.com/TU_BASE_DE_DATOS"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblVkKGxR5yp0lcf4",
+          "mode": "list",
+          "cachedResultName": "Tickets",
+          "cachedResultUrl": "https://airtable.com/TU_ID_DE_BASE/TU_ID_DE_TABLA"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Calificación Atención": "={{ $json.chatInput }}",
+            "id": "={{ $('Crear Ticket').item.json.id }}",
+            "Responsable": "={{ ['recnSYvNXBcGOpU0U'] }}",
+            "Estado": "Resuelto",
+            "Fecha Resolución": "={{ $now }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha Creación",
+              "displayName": "Fecha Creación",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Link a Cliente",
+              "displayName": "Link a Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Prioridad de Atención",
+              "displayName": "Prioridad de Atención",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Alta",
+                  "value": "Alta"
+                },
+                {
+                  "name": "Normal",
+                  "value": "Normal"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Responsable",
+              "displayName": "Responsable",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Vertical",
+              "displayName": "Vertical",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Soporte de cuenta",
+                  "value": "Soporte de cuenta"
+                },
+                {
+                  "name": "Préstamos",
+                  "value": "Préstamos"
+                },
+                {
+                  "name": "Cobranzas y pagos",
+                  "value": "Cobranzas y pagos"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Abierto",
+                  "value": "Abierto"
+                },
+                {
+                  "name": "Escalado",
+                  "value": "Escalado"
+                },
+                {
+                  "name": "Pendiente",
+                  "value": "Pendiente"
+                },
+                {
+                  "name": "Resuelto",
+                  "value": "Resuelto"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Calificación Atención",
+              "displayName": "Calificación Atención",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Fecha Resolución",
+              "displayName": "Fecha Resolución",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Tiempo resolución",
+              "displayName": "Tiempo resolución",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1568,
+        -544
+      ],
+      "id": "74458a49-0ca5-4dc3-acbc-4f5a15e67599",
+      "name": "Update record1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ezv5BIimzUR18MRg",
+          "name": "Alegra cash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appG3yTiOUZrnggci",
+          "mode": "list",
+          "cachedResultName": "ALEGRA-CASH Gestión",
+          "cachedResultUrl": "https://airtable.com/TU_BASE_DE_DATOS"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblVkKGxR5yp0lcf4",
+          "mode": "list",
+          "cachedResultName": "Tickets",
+          "cachedResultUrl": "https://airtable.com/TU_ID_DE_BASE/TU_ID_DE_TABLA"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Calificación Atención": "={{ $json.chatInput }}",
+            "id": "{{ $('Crear Ticket').item.json.id }}",
+            "Responsable": "[ \"recnSYvNXBcGOpU0U\" ]",
+            "Estado": "Resuelto",
+            "Fecha Resolución": "2025-11-21T06:35:04"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha Creación",
+              "displayName": "Fecha Creación",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Link a Cliente",
+              "displayName": "Link a Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Prioridad de Atención",
+              "displayName": "Prioridad de Atención",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Alta",
+                  "value": "Alta"
+                },
+                {
+                  "name": "Normal",
+                  "value": "Normal"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Responsable",
+              "displayName": "Responsable",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Vertical",
+              "displayName": "Vertical",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Soporte de cuenta",
+                  "value": "Soporte de cuenta"
+                },
+                {
+                  "name": "Préstamos",
+                  "value": "Préstamos"
+                },
+                {
+                  "name": "Cobranzas y pagos",
+                  "value": "Cobranzas y pagos"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Abierto",
+                  "value": "Abierto"
+                },
+                {
+                  "name": "Escalado",
+                  "value": "Escalado"
+                },
+                {
+                  "name": "Pendiente",
+                  "value": "Pendiente"
+                },
+                {
+                  "name": "Resuelto",
+                  "value": "Resuelto"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Calificación Atención",
+              "displayName": "Calificación Atención",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Fecha Resolución",
+              "displayName": "Fecha Resolución",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Tiempo resolución",
+              "displayName": "Tiempo resolución",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1408,
+        -304
+      ],
+      "id": "8b77b916-dd94-49e0-b45a-6bc798ebf1e4",
+      "name": "Update record2",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ezv5BIimzUR18MRg",
+          "name": "Alegra cash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appG3yTiOUZrnggci",
+          "mode": "list",
+          "cachedResultName": "ALEGRA-CASH Gestión",
+          "cachedResultUrl": "https://airtable.com/TU_BASE_DE_DATOS"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblVkKGxR5yp0lcf4",
+          "mode": "list",
+          "cachedResultName": "Tickets",
+          "cachedResultUrl": "https://airtable.com/TU_ID_DE_BASE/TU_ID_DE_TABLA"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Calificación Atención": "={{ $json.chatInput }}",
+            "id": "{{ $('Crear Ticket').item.json.id }}",
+            "Responsable": "[ \"recnSYvNXBcGOpU0U\" ]",
+            "Estado": "Resuelto",
+            "Fecha Resolución": "={{ $now }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha Creación",
+              "displayName": "Fecha Creación",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Link a Cliente",
+              "displayName": "Link a Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Prioridad de Atención",
+              "displayName": "Prioridad de Atención",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Alta",
+                  "value": "Alta"
+                },
+                {
+                  "name": "Normal",
+                  "value": "Normal"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Responsable",
+              "displayName": "Responsable",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Vertical",
+              "displayName": "Vertical",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Soporte de cuenta",
+                  "value": "Soporte de cuenta"
+                },
+                {
+                  "name": "Préstamos",
+                  "value": "Préstamos"
+                },
+                {
+                  "name": "Cobranzas y pagos",
+                  "value": "Cobranzas y pagos"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Abierto",
+                  "value": "Abierto"
+                },
+                {
+                  "name": "Escalado",
+                  "value": "Escalado"
+                },
+                {
+                  "name": "Pendiente",
+                  "value": "Pendiente"
+                },
+                {
+                  "name": "Resuelto",
+                  "value": "Resuelto"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Calificación Atención",
+              "displayName": "Calificación Atención",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Fecha Resolución",
+              "displayName": "Fecha Resolución",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Tiempo resolución",
+              "displayName": "Tiempo resolución",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1408,
+        -128
+      ],
+      "id": "6ecd086b-9e35-4647-a600-491f0b2fe4fd",
+      "name": "Update record3",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ezv5BIimzUR18MRg",
+          "name": "Alegra cash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appG3yTiOUZrnggci",
+          "mode": "list",
+          "cachedResultName": "ALEGRA-CASH Gestión",
+          "cachedResultUrl": "https://airtable.com/TU_BASE_DE_DATOS"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblVkKGxR5yp0lcf4",
+          "mode": "list",
+          "cachedResultName": "Tickets",
+          "cachedResultUrl": "https://airtable.com/TU_ID_DE_BASE/TU_ID_DE_TABLA"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Estado": "Abierto",
+            "id": "={{ $('Crear Ticket').item.json.id }}",
+            "Responsable": "=[ \"{{ $json.Record_id }}\" ]",
+            "Prioridad de Atención": "={{ $('Search records').item.json['Tipo de usuario'] == 'Pro' ? 'Alta' : 'Normal' }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha Creación",
+              "displayName": "Fecha Creación",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Link a Cliente",
+              "displayName": "Link a Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Prioridad de Atención",
+              "displayName": "Prioridad de Atención",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Alta",
+                  "value": "Alta"
+                },
+                {
+                  "name": "Normal",
+                  "value": "Normal"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Responsable",
+              "displayName": "Responsable",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Vertical",
+              "displayName": "Vertical",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Soporte de cuenta",
+                  "value": "Soporte de cuenta"
+                },
+                {
+                  "name": "Préstamos",
+                  "value": "Préstamos"
+                },
+                {
+                  "name": "Cobranzas y pagos",
+                  "value": "Cobranzas y pagos"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Abierto",
+                  "value": "Abierto"
+                },
+                {
+                  "name": "Escalado",
+                  "value": "Escalado"
+                },
+                {
+                  "name": "Pendiente",
+                  "value": "Pendiente"
+                },
+                {
+                  "name": "Resuelto",
+                  "value": "Resuelto"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Calificación Atención",
+              "displayName": "Calificación Atención",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "c897908b-390b-4761-8b91-8cfef856fe12",
+      "name": "Act. asignación ticket y estado",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        176,
+        128
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ezv5BIimzUR18MRg",
+          "name": "Alegra cash"
+        }
+      },
+      "notes": "Aquí simulas que el Bot lo resuelve y cierras el ticket."
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appG3yTiOUZrnggci",
+          "mode": "list",
+          "cachedResultName": "ALEGRA-CASH Gestión",
+          "cachedResultUrl": "https://airtable.com/TU_BASE_DE_DATOS"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblVkKGxR5yp0lcf4",
+          "mode": "list",
+          "cachedResultName": "Tickets",
+          "cachedResultUrl": "https://airtable.com/TU_ID_DE_BASE/TU_ID_DE_TABLA"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Estado": "Resuelto",
+            "id": "={{ $('Crear Ticket').item.json.id }}",
+            "Calificación Atención": "={{ $json.chatInput }}",
+            "Fecha Resolución": "={{ $now }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha Creación",
+              "displayName": "Fecha Creación",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Link a Cliente",
+              "displayName": "Link a Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Prioridad de Atención",
+              "displayName": "Prioridad de Atención",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Alta",
+                  "value": "Alta"
+                },
+                {
+                  "name": "Normal",
+                  "value": "Normal"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Responsable",
+              "displayName": "Responsable",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Vertical",
+              "displayName": "Vertical",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Soporte de cuenta",
+                  "value": "Soporte de cuenta"
+                },
+                {
+                  "name": "Préstamos",
+                  "value": "Préstamos"
+                },
+                {
+                  "name": "Cobranzas y pagos",
+                  "value": "Cobranzas y pagos"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Abierto",
+                  "value": "Abierto"
+                },
+                {
+                  "name": "Escalado",
+                  "value": "Escalado"
+                },
+                {
+                  "name": "Pendiente",
+                  "value": "Pendiente"
+                },
+                {
+                  "name": "Resuelto",
+                  "value": "Resuelto"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Calificación Atención",
+              "displayName": "Calificación Atención",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Fecha Resolución",
+              "displayName": "Fecha Resolución",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Tiempo resolución",
+              "displayName": "Tiempo resolución",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "4f694c54-c942-4dbe-a037-f2b3214dff62",
+      "name": "Ticket Resuelto",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        1808,
+        64
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ezv5BIimzUR18MRg",
+          "name": "Alegra cash"
+        }
+      },
+      "notes": "Aquí simulas que el Bot lo resuelve y cierras el ticket."
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Buscar Analista Ideal": {
+      "main": [
+        [
+          {
+            "node": "Act. asignación ticket y estado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "chatInput 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Extracción de Datos",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Extracción de Datos",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Bot Contraseña",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Buscar Analista Ideal",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Buscar Analista Ideal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "chatInput 1": {
+      "main": [
+        [
+          {
+            "node": "Extracción de Datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Bot Contraseña",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Bot Contraseña",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bot Contraseña": {
+      "main": [
+        [
+          {
+            "node": "Respond to Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Chat": {
+      "main": [
+        [
+          {
+            "node": "Confirma cambio?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Encuesta": {
+      "main": [
+        [
+          {
+            "node": "Respondió?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respondió?": {
+      "main": [
+        [
+          {
+            "node": "Update record2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update record3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirma cambio?": {
+      "main": [
+        [
+          {
+            "node": "Funcionó?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Encuesta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Encuesta1": {
+      "main": [
+        [
+          {
+            "node": "Respondió?.",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Funcionó?": {
+      "main": [
+        [
+          {
+            "node": "Encuesta1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Bot Contraseña",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respondió?.": {
+      "main": [
+        [
+          {
+            "node": "Update record",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update record1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extracción de Datos": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Chat1": {
+      "main": [
+        []
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Datos completos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Datos completos": {
+      "main": [
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Chat1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records": {
+      "main": [
+        [
+          {
+            "node": "Crear Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear Ticket": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notificación Analista": {
+      "main": [
+        [
+          {
+            "node": "Nivel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Chat2": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "La Solución + Encuesta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "La Solución + Encuesta": {
+      "main": [
+        [
+          {
+            "node": "Respondió?1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respondió?1": {
+      "main": [
+        [
+          {
+            "node": "Ticket Resuelto",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Cierre Final1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cierre Final1": {
+      "main": [
+        [
+          {
+            "node": "Cierre2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Chat3": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nivel": {
+      "main": [
+        [
+          {
+            "node": "Respond to Chat2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Chat3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agradecimiento1": {
+      "main": [
+        []
+      ]
+    },
+    "Update record": {
+      "main": [
+        [
+          {
+            "node": "Agradecimiento1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update record1": {
+      "main": [
+        [
+          {
+            "node": "Cierre1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update record2": {
+      "main": [
+        [
+          {
+            "node": "Agradecimiento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update record3": {
+      "main": [
+        [
+          {
+            "node": "Cierre",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Act. asignación ticket y estado": {
+      "main": [
+        [
+          {
+            "node": "Notificación Analista",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ticket Resuelto": {
+      "main": [
+        [
+          {
+            "node": "Agradecimiento2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Bogota",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "8ef57f5f-7e56-4f57-af19-5ef70d2eac35",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "90074a29af515b5d8acf41223084cfe070a1020ec6ff38ab31e5dba175f6f80c"
+  },
+  "id": "JKKZ9JzAK8btlNrX",
+  "tags": [
+    {
+      "createdAt": "2026-02-22T13:36:58.947Z",
+      "updatedAt": "2026-02-22T13:36:58.947Z",
+      "id": "Ug4xFqFpcOJrCVlh",
+      "name": "Bot"
+    },
+    {
+      "name": "Gestión Ticket",
+      "id": "X4D2UgKXEU9kFWbW",
+      "createdAt": "2026-02-22T13:37:55.899Z",
+      "updatedAt": "2026-02-22T13:37:55.899Z"
+    },
+    {
+      "createdAt": "2025-08-03T03:21:45.102Z",
+      "updatedAt": "2025-08-03T03:21:45.102Z",
+      "id": "hiMYm5IYH2nxcDy6",
+      "name": "Gmail"
+    }
+  ]
+}
