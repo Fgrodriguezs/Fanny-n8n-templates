@@ -1,4 +1,4 @@
-# 🤖 Fanny Rodriguez | AI Automation Lead
+# 🤖 Fanny Rodriguez | AI Data Analysts & Automation Specialist
 
 ![n8n](https://img.shields.io/badge/n8n-Automation-red)
 ![OpenAI](https://img.shields.io/badge/OpenAI-AI%20Agents-green)
@@ -8,7 +8,7 @@
 > Production-ready AI automation templates built with n8n, OpenAI, Airtable, Google APIs, and CRMs.  
 > Plantillas de automatización listas para producción con n8n, OpenAI, Airtable, Google APIs y CRMs.
 
-## 🔥 Real Impact (From CV)
+## 🔥 Real Impact
 **Datapath AI (2024-)**: AI Automation Lead - Production pipelines  
 **PraxIA Solutions (2025)**: PyME automation - 70% lead response boost  
 **5+ enterprise workflows** con **n8n + CRM + OpenAI + Airtable + Supabase**
